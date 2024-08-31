@@ -1,43 +1,40 @@
 import { Console, Random } from '@woowacourse/mission-utils';
-import validateInput from './validate.js';
+import UserNumbersValidator from './UserNumbersValidator.js';
+import UserRetryValidator from './UserRetryValidator.js';
+import Printer from './Printer.js';
+import Reader from './Reader.js';
+import GameAsset from './GameAsset.js';
 
 class App {
+  #userNumbersValidator;
+  #userRetryValidator;
+  #gameAsset;
+
+  constructor() {
+    this.#userNumbersValidator = new UserNumbersValidator();
+    this.#userRetryValidator = new UserRetryValidator();
+    this.#gameAsset = new GameAsset();
+  }
+
+  #shouldRetry = (reKeyword) => {
+    this.#userRetryValidator.validate(reKeyword);
+    if (reKeyword === '1') {
+      return true;
+    } else if (reKeyword === '2') {
+      return false;
+    }
+  };
+
   async play() {
     await Console.print('숫자 야구 게임을 시작합니다.');
     // 컴퓨터가 제공하는 랜덤 숫자 3자리 얻기
-    const computer = [];
-    while (computer.length < 3) {
-      const number = Random.pickNumberInRange(1, 9);
-      if (!computer.includes(number)) {
-        computer.push(number);
-      }
-    }
-    console.log(computer);
+    const computer = Random.pickUniqueNumbersInRange(1, 9, 3);
 
-    // 3스트라이크까지 반복 {
+    while (this.#gameAsset.getStrikeCount() !== 3) {
+      this.#gameAsset.init();
+      const input = await Reader.read('숫자를 입력해주세요 : ');
 
-    let ball;
-    let strike;
-
-    while (strike !== 3) {
-      ball = 0;
-      strike = 0;
-
-      // 유저가 3자리 입력
-      const input = await Console.readLineAsync('숫자를 입력해주세요 : ');
-
-      /* 예외처리
-      1.숫자가 아닌경우
-      2.숫자인데 3자리가 아닌경우
-      3.숫자이고 3자리인데 3개가 겹치는 숫자가 있는 경우
-      */
-
-      try {
-        validateInput(input);
-      } catch (error) {
-        Console.print(error.message);
-        break;
-      }
+      this.#userNumbersValidator.validate(input);
 
       const user = input.split('').map(Number);
 
@@ -45,29 +42,33 @@ class App {
       // 스트라이크 개수 판단
       for (let i = 0; i < 3; i++) {
         if (computer[i] === user[i]) {
-          strike++;
+          this.#gameAsset.increaseStrikeCount();
         }
       }
 
       for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
           if (computer[i] === user[j] && i !== j) {
-            ball++;
+            this.#gameAsset.increaseBallCount();
           }
         }
       }
 
-      console.log(`${ball}볼 ${strike}스트라이크`);
-      if (strike === 3) {
-        console.log('3개의 숫자를 모두 맞히셨습니다! 게임 종료');
+      await Printer.print(
+        `${this.#gameAsset.getBallCount()}볼 ${this.#gameAsset.getStrikeCount()}스트라이크`
+      );
+      if (this.#gameAsset.getStrikeCount() === 3) {
+        await Printer.print('3개의 숫자를 모두 맞히셨습니다! 게임 종료');
 
-        const reKeyword = await Console.readLineAsync(
+        const reKeyword = await Reader.read(
           '게임을 새로 시작하려면 1, 종료하려면 2를 입력하세요.\n'
         );
 
-        if (reKeyword === '1') {
+        Printer.print(error.message);
+
+        if (this.#shouldRetry(reKeyword)) {
           this.play();
-        } else if (reKeyword === '2') {
+        } else {
           break;
         }
       }

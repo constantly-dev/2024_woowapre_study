@@ -1,4 +1,9 @@
 import App from './App.js';
+import Printer from './Printer.js';
 
 const app = new App();
-await app.play();
+try {
+  await app.play();
+} catch (error) {
+  Printer.print(error.message);
+}
