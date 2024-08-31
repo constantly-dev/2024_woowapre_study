@@ -51,7 +51,7 @@ class App {
       */
 
       try {
-        validateInput(input);
+        this.validateInput(input);
       } catch (error) {
         Console.print(error.message);
         break;
