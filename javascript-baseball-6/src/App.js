@@ -4,16 +4,18 @@ import UserRetryValidator from './UserRetryValidator.js';
 import Printer from './Printer.js';
 import Reader from './Reader.js';
 import GameAsset from './GameAsset.js';
+import BaseBallPolicy from './BaseBallPolicy.js';
 
 class App {
   #userNumbersValidator;
   #userRetryValidator;
   #gameAsset;
-
+  #baseBallPolicy;
   constructor() {
     this.#userNumbersValidator = new UserNumbersValidator();
     this.#userRetryValidator = new UserRetryValidator();
     this.#gameAsset = new GameAsset();
+    this.#baseBallPolicy = new BaseBallPolicy();
   }
 
   #shouldRetry = (reKeyword) => {
@@ -30,6 +32,10 @@ class App {
     // 컴퓨터가 제공하는 랜덤 숫자 3자리 얻기
     const computer = Random.pickUniqueNumbersInRange(1, 9, 3);
 
+    // 리팩토링 필요
+    Printer.print(computer);
+    this.#gameAsset.init();
+
     while (this.#gameAsset.getStrikeCount() !== 3) {
       this.#gameAsset.init();
       const input = await Reader.read('숫자를 입력해주세요 : ');
@@ -41,14 +47,15 @@ class App {
       // 컴퓨터 랜덤 숫자와 유저 입력 숫자를 비교
       // 스트라이크 개수 판단
       for (let i = 0; i < 3; i++) {
-        if (computer[i] === user[i]) {
+        if (this.#baseBallPolicy.isStrike(computer, user, i)) {
           this.#gameAsset.increaseStrikeCount();
         }
       }
 
+      // 볼 개수 판단
       for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
-          if (computer[i] === user[j] && i !== j) {
+          if (this.#baseBallPolicy.isBall(computer, user, i, j)) {
             this.#gameAsset.increaseBallCount();
           }
         }
@@ -63,8 +70,6 @@ class App {
         const reKeyword = await Reader.read(
           '게임을 새로 시작하려면 1, 종료하려면 2를 입력하세요.\n'
         );
-
-        Printer.print(error.message);
 
         if (this.#shouldRetry(reKeyword)) {
           this.play();
