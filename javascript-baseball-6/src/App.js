@@ -28,11 +28,10 @@ class App {
   };
 
   async play() {
-    await Console.print('숫자 야구 게임을 시작합니다.');
+    await Printer.print('숫자 야구 게임을 시작합니다.');
     // 컴퓨터가 제공하는 랜덤 숫자 3자리 얻기
     const computer = Random.pickUniqueNumbersInRange(1, 9, 3);
 
-    // 리팩토링 필요
     Printer.print(computer);
     this.#gameAsset.init();
 
