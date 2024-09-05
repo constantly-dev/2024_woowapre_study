@@ -1,5 +1,6 @@
 import { Random } from '@woowacourse/mission-utils';
 import UserNumbersValidator from './UserNumbersValidator.js';
+import UserRetryValidator from './UserRetryValidator.js';
 
 export default class BaseBallPolicy {
   static MIN_NUMBER = 1;
@@ -7,6 +8,7 @@ export default class BaseBallPolicy {
   static GAME_NUMBER_LENGTH = 3;
 
   #userNumbersValidator = new UserNumbersValidator();
+  #userRetryValidator = new UserRetryValidator();
 
   isStrike = (computer, userNumber, index) => {
     return computer[index] === userNumber;
@@ -16,27 +18,23 @@ export default class BaseBallPolicy {
     return user.includes(comNumber) && computer[index] !== user[index];
   };
 
-  calculateStrikeCount = (computer, user) => {
-    return user.filter((userNumber, index) =>
-      this.isStrike(computer, userNumber, index)
-    ).length;
-  };
-
-  calculateBallCount = (computer, user) => {
-    return computer.filter((comNumber, index) =>
-      this.isBall(computer, user, index, comNumber)
-    ).length;
-  };
-
-  isGameEnd = (GameAsset) => {
-    return GameAsset.getStrikeCount() === BaseBallPolicy.GAME_NUMBER_LENGTH;
+  isGameEnd = (instance) => {
+    return instance.getStrikeCount() === BaseBallPolicy.GAME_NUMBER_LENGTH;
   };
 
   generateRandomNumbers = () => {
-    return Random.pickUniqueNumbersInRange(1, 9, 3);
+    return Random.pickUniqueNumbersInRange(
+      BaseBallPolicy.MIN_NUMBER,
+      BaseBallPolicy.MAX_NUMBER,
+      BaseBallPolicy.GAME_NUMBER_LENGTH
+    );
   };
 
   validateUserNumbers = (input) => {
     this.#userNumbersValidator.validate(input);
+  };
+
+  validateRetry = (reKeyword) => {
+    this.#userRetryValidator.validate(reKeyword);
   };
 }
