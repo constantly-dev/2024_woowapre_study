@@ -1,5 +1,5 @@
-import App from './App.js';
-import Printer from './Printer.js';
+import App from './controller/App.js';
+import Printer from './view/utils/Printer.js';
 
 const app = new App();
 try {

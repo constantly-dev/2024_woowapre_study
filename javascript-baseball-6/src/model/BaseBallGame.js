@@ -1,7 +1,6 @@
 // static은 외부 클래스에 참조되는 횟수가 많다고 판단될때 사용
-
+import GameRoundResponse from '../dto/GameRoundResponse.js';
 import BaseBallPolicy from './BaseBallPolicy.js';
-import GameRoundResponse from './GameRoundResponse.js';
 
 export default class BaseBallGame {
   #baseBallPolicy;
@@ -20,24 +19,27 @@ export default class BaseBallGame {
     this.#generateRandomNumbers();
   };
 
-  #generateRandomNumbers = async () => {
+  #generateRandomNumbers = () => {
     this.#computer = this.#baseBallPolicy.generateRandomNumbers();
+    console.log(this.#computer);
   };
 
-  processRoundResult = async (user) => {
-    const ballCount = await this.#processBall(this.#computer, user);
-    const strikeCount = await this.#processStrike(this.#computer, user);
+  processRound = (user) => {
+    this.#validateNumbers(user);
+
+    const ballCount = this.#processBall(this.#computer, user);
+    const strikeCount = this.#processStrike(this.#computer, user);
     return new GameRoundResponse(ballCount, strikeCount);
   };
 
-  #processBall = async (computer, user) => {
+  #processBall = (computer, user) => {
     const ballCount = computer.filter((comNumber, index) =>
       this.#baseBallPolicy.isBall(computer, user, index, comNumber)
     ).length;
     return ballCount;
   };
 
-  #processStrike = async (computer, user) => {
+  #processStrike = (computer, user) => {
     const strikeCount = user.filter((userNumber, index) =>
       this.#baseBallPolicy.isStrike(computer, userNumber, index)
     ).length;
@@ -48,11 +50,7 @@ export default class BaseBallGame {
     return this.#baseBallPolicy.isGameEnd(ballAndStrikeCount);
   };
 
-  processValidateNumbers = (input) => {
+  #validateNumbers = (input) => {
     this.#baseBallPolicy.validateUserNumbers(input);
-  };
-
-  processValidateRetry = (reKeyword) => {
-    this.#baseBallPolicy.validateRetry(reKeyword);
   };
 }

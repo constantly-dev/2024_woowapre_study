@@ -1,14 +1,9 @@
 import { Random } from '@woowacourse/mission-utils';
-import UserNumbersValidator from './UserNumbersValidator.js';
-import UserRetryValidator from './UserRetryValidator.js';
 
 export default class BaseBallPolicy {
   static MIN_NUMBER = 1;
   static MAX_NUMBER = 9;
   static GAME_NUMBER_LENGTH = 3;
-
-  #userNumbersValidator = new UserNumbersValidator();
-  #userRetryValidator = new UserRetryValidator();
 
   isStrike = (computer, userNumber, index) => {
     return computer[index] === userNumber;
@@ -31,10 +26,22 @@ export default class BaseBallPolicy {
   };
 
   validateUserNumbers = (input) => {
-    this.#userNumbersValidator.validate(input);
+    this.#validateNumberLen(input);
+    this.#validateConflict(input);
   };
 
-  validateRetry = (reKeyword) => {
-    this.#userRetryValidator.validate(reKeyword);
+  #validateNumberLen = (input) => {
+    if (input.length !== BaseBallPolicy.GAME_NUMBER_LENGTH) {
+      throw new Error(
+        `입력한 숫자는 반드시 ${BaseBallPolicy.GAME_NUMBER_LENGTH}자리여야 합니다.`
+      );
+    }
+  };
+
+  #validateConflict = (input) => {
+    const uniqueDigits = new Set(input);
+    if (uniqueDigits.size !== BaseBallPolicy.GAME_NUMBER_LENGTH) {
+      throw new Error('입력한 숫자에 중복된 숫자가 있습니다.');
+    }
   };
 }
