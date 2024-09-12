@@ -33,7 +33,7 @@ export default class BaseBallPolicy {
   #validateNumberLen = (input) => {
     if (input.length !== BaseBallPolicy.GAME_NUMBER_LENGTH) {
       throw new Error(
-        `입력한 숫자는 반드시 ${BaseBallPolicy.GAME_NUMBER_LENGTH}자리여야 합니다.`
+        `[ERROR] 입력한 숫자는 반드시 ${BaseBallPolicy.GAME_NUMBER_LENGTH}자리여야 합니다.`
       );
     }
   };
@@ -41,7 +41,7 @@ export default class BaseBallPolicy {
   #validateConflict = (input) => {
     const uniqueDigits = new Set(input);
     if (uniqueDigits.size !== BaseBallPolicy.GAME_NUMBER_LENGTH) {
-      throw new Error('입력한 숫자에 중복된 숫자가 있습니다.');
+      throw new Error('[ERROR] 입력한 숫자에 중복된 숫자가 있습니다.');
     }
   };
 }

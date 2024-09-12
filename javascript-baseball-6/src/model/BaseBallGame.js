@@ -21,7 +21,6 @@ export default class BaseBallGame {
 
   #generateRandomNumbers = () => {
     this.#computer = this.#baseBallPolicy.generateRandomNumbers();
-    console.log(this.#computer);
   };
 
   processRound = (user) => {

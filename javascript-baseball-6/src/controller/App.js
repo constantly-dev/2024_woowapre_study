@@ -35,11 +35,13 @@ class App {
     await this.#processBeforeGame();
 
     while (!this.#isGameEnd) {
-      const user = await this.#numbersInputView.read();
-
-      const ballAndStrikeCount = this.#baseBallGame.processRound(user);
-
-      await this.#processAfterRound(ballAndStrikeCount);
+      try {
+        const user = await this.#numbersInputView.read();
+        const ballAndStrikeCount = this.#baseBallGame.processRound(user);
+        await this.#processAfterRound(ballAndStrikeCount);
+      } catch (error) {
+        console.error(error.message); // 에러 메시지를 출력하고 루프를 계속 진행
+      }
     }
   }
 
